@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.StaffDao">
+
+    <!--.................................基本信息...............................................-->
+    <select id="findAllStaff" parameterType="Staff" resultType="Staff">
+        select * from staff where staff_del=1
+        <if test="staff_name!=null and staff_name!=''">
+            and staff_name like concat('%',#{staff_name},'%')
+        </if>
+    </select>
+
+    <select id="findStaffById" parameterType="Integer" resultType="Staff">
+        select * from staff where staff_id=#{staff_id}
+    </select>
+
+    <update id="updateStaff" parameterType="Staff">
+        update staff
+        <set>
+            <if test="staff_name!=null and staff_name!=''">
+                staff_name=#{staff_name},
+            </if>
+            <if test="staff_loginname!=null and staff_loginname!='' ">
+                staff_loginname=#{staff_loginname},
+            </if>
+            <if test="staff_password!=null and staff_password!=''">
+                staff_password=#{staff_password},
+            </if>
+            <if test="staff_telephone!=null and staff_telephone!=''">
+                staff_telephone=#{staff_telephone},
+            </if>
+            <if test="staff_gender!=null and staff_gender!=0">
+                staff_gender=#{staff_gender},
+            </if>
+            <if test="staff_job_number!=null and staff_job_number!=''">
+                staff_job_number=#{staff_job_number},
+            </if>
+            <if test="staff_position!=null and staff_position!='' ">
+                staff_position=#{staff_position},
+            </if>
+            <if test="staff_identification_code!=null and staff_identification_code!=''">
+                staff_identification_code=#{staff_identification_code},
+            </if>
+            <if test="staff_working_condition!=null and staff_working_condition!=0">
+                staff_working_condition=#{staff_working_condition},
+            </if>
+            <if test="staff_state!=null and staff_state!=0">
+                staff_state=#{staff_state},
+            </if>
+            <if test="staff_remarks!=null and staff_remarks!='' ">
+                staff_remarks=#{staff_remarks}
+            </if>
+        </set>
+        where staff_id = #{staff_id}
+    </update>
+
+    <update id="deleteStaff" parameterType="Integer">
+        update staff set staff_del=2 where staff_id=#{staff_id}
+    </update>
+
+    <insert id="insertStaff" parameterType="Staff">
+        insert into staff (staff_name,staff_loginname,staff_password,staff_telephone,staff_gender,staff_job_number,staff_position,
+        staff_identification_code,staff_working_condition,staff_state,staff_remarks,staff_del)
+        values (#{staff_name},#{staff_loginname},#{staff_password},#{staff_telephone},#{staff_gender},#{staff_job_number},#{staff_position},
+        #{staff_identification_code},#{staff_working_condition},1,#{staff_remarks},1)
+    </insert>
+
+
+
+
+
+    <!--.................................骑手出入库信息...............................................-->
+    <select id="findAllStaff_warehousing" parameterType="Staff_warehousing" resultType="Staff_warehousing">
+        select * from staff_warehousing where  swg_del=1
+        <if test="swg_applicant!=0 and swg_applicant!=null">
+            and swg_applicant=#{swg_applicant}
+        </if>
+        <if test="swg_water_station!=0 and swg_water_station!=null">
+            and swg_water_station=#{swg_water_station}
+        </if>
+        <if test="swg_startdate!=null and swg_enddate!=null">
+            and swg_approval_time between #{swg_startdate} and #{swg_enddate}
+        </if>
+        <if test="swg_startdate==null and swg_enddate!=null">
+            and swg_approval_time &lt; #{swg_enddate}
+        </if>
+    </select>
+
+    <select id="findStaff_warehousing_detailedBySwg_id" parameterType="Integer" resultType="Staff_warehousing_detailed">
+        select swdd.*,com.commodity_name swdd_commodity_name from staff_warehousing_detailed swdd,commodity com
+        where swdd_staff_warehousing_id=#{swg_id} and swdd.swdd_commodity_id=com.commodity_id
+    </select>
+
+
+
+    <!--.................................骑手押金信息...............................................-->
+    <select id="findAllStaff_deposit" parameterType="Staff_deposit" resultType="Staff_deposit">
+        select * from staff_deposit where sdt_del=1
+        <if test="sdt_customer_id!=null and sdt_customer_id!=0">
+            and sdt_customer_id=#{sdt_customer_id}
+        </if>
+        <if test="sdt_staff_id!=null and sdt_staff_id!=0">
+            and sdt_staff_id=#{sdt_staff_id}
+        </if>
+        <if test="sdt_startdate!=null and sdt_enddate!=null">
+            and sdt_deposit_datetime between #{sdt_startdate} and #{sdt_enddate}
+        </if>
+        <if test="sdt_startdate==null and sdt_enddate!=null">
+            and sdt_deposit_datetime &lt; #{sdt_enddate}
+        </if>
+
+    </select>
+
+    <select id="findStaff_depositById" parameterType="String" resultType="Staff_deposit">
+        select * from  staff_deposit where sdt_deposit_document_no=#{sdt_deposit_document_no} and sdt_del=1
+    </select>
+
+    <select id="findStaff_deposit_detailedBySdt_id" parameterType="Integer" resultType="Staff_deposit_detailed">
+        select cfdd.*,com.commodity_name sfdd_commodity_name from staff_deposit_detailed cfdd,commodity com
+        where cfdd.sfdd_commodity_id=com.commodity_id and sfdd_sdt_id=#{sdt_id}
+    </select>
+
+
+
+
+    <!--.................................日结算信息...............................................-->
+    <select id="findAllDaily_settlement" parameterType="Daily_settlement" resultType="Daily_settlement">
+        select * from daily_settlement where dst_del=1
+        <if test="dst_applicant!=null and dst_applicant!=0">
+            and dst_applicant=#{dst_applicant}
+        </if>
+        <if test="dst_approved!=null and dst_approved!=0">
+            and dst_approved=#{dst_approved}
+        </if>
+        <if test="dst_startdate!=null and dst_enddate!=null">
+            and dst_approval_time between #{dst_startdate} and #{dst_enddate}
+        </if>
+        <if test="dst_startdate==null and dst_enddate!=null">
+            and dst_approval_time &lt; #{dst_enddate}
+        </if>
+    </select>
+
+    <select id="findDaily_settlementByStaff_id" parameterType="String" resultType="Daily_settlement">
+        select * from daily_settlement where dst_del=1 and dst_code=#{dst_code}
+    </select>
+
+</mapper>

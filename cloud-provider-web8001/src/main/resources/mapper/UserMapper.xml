@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.UserDao">
+
+
+   <select id="findUserByName" parameterType="String" resultType="User">
+       select * from user where user_loginname = #{user_loginname}
+   </select>
+
+   <select id="checkLoginName" parameterType="String" resultType="int">
+       select count(*) from user where user_loginname = #{user_loginname}
+   </select>
+
+   <select id="findUserById" parameterType="Long" resultType="User">
+       select us.*,ro.role_name from user as us,role as ro where us.user_role_id = ro.role_id and user_id = #{user_id}
+   </select>
+
+   <select id="findAllUser" parameterType="User" resultType="User">
+        select * from user where user_del=1
+        <if test="user_name!=null and user_name!=''">
+           and user_name like concat('%',#{user_name},'%')
+        </if>
+    </select>
+    
+    <update id="updateUser" parameterType="User" >
+        update user set user_loginname = #{user_loginname},user_sex=#{user_sex}, user_phone=#{user_phone},user_remark=#{user_remark},user_remark=#{user_remark}, user_name=#{user_name},user_role_id=#{user_role_id},user_password=#{user_password},  user_state=#{user_state}
+        where user_id = #{user_id}
+    </update>
+
+    <update id="deleteUser" parameterType="Long" >
+        update user set user_del=2 where user_id = #{id}
+    </update>
+
+    <insert id="insertUser" parameterType="User">
+        insert into user (user_loginname,user_password,user_state,user_del,user_role_id,user_sex,user_phone,user_remark,user_name)
+        values (#{user_loginname},#{user_password},1,1,#{user_role_id},#{user_sex},#{user_phone},#{user_remark},#{user_name})
+    </insert>
+
+    <!-- 添加日志 -->
+    <insert id="insertLog" parameterType="com.web.pojo.SysLog">
+        insert into log(username,operation,method,params,ip,createDate) values (#{username},#{operation},#{method},#{params},#{ip},#{createDate})
+    </insert>
+</mapper>

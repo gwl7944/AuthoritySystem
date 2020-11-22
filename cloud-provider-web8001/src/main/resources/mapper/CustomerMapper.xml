@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.CustomerDao">
+
+    <!--.......................................基本信息...................................................-->
+    <select id="findAllCustomer" parameterType="Customer" resultType="Customer">
+        select * from customer where customer_del=1
+        <if test="customer_name!=null and customer_name!=''">
+            customer_name like concat('%',#{customer_name},'%')
+        </if>
+    </select>
+
+    <select id="findCustomerById" parameterType="Integer" resultType="Customer">
+        select * from customer where customer_id=#{customer_id}
+    </select>
+
+    <update id="updateCustomer" parameterType="Customer">
+        update customer
+        <set>
+            <if test="customer_name!=null and customer_name!=''">
+                customer_name=#{customer_name},
+            </if>
+            <if test="customer_telephone!=null and customer_telephone!='' ">
+                customer_telephone=#{customer_telephone},
+            </if>
+            <if test="customer_wechat_number!=null and customer_wechat_number!=''">
+                customer_wechat_number=#{customer_wechat_number},
+            </if>
+            <if test="customer_openid!=null and customer_openid!=''">
+                customer_openid=#{customer_openid},
+            </if>
+            <if test="customer_gender!=null and customer_gender!='' and customer_gender!=0">
+                customer_gender=#{customer_gender},
+            </if>
+            <if test="customer_birthday!=null">
+                customer_birthday=#{customer_birthday},
+            </if>
+            <if test="customer_type!=null and customer_type!='' and customer_type!=0 ">
+                customer_type=#{customer_type},
+            </if>
+            <if test="customer_state!=null and customer_state!='' and customer_state!=0">
+                customer_state=#{customer_state},
+            </if>
+            <if test="customer_remarks!=null and customer_remarks!=''">
+                customer_remarks=#{customer_remarks}
+            </if>
+        </set>
+        where customer_id = #{customer_id}
+    </update>
+
+    <update id="deleteCustomer" parameterType="Integer">
+        update customer set customer_del=2 where customer_id=#{customer_id}
+    </update>
+
+    <insert id="insertCustomer" parameterType="Customer">
+        insert into customer (customer_name,customer_telephone,customer_wechat_number,customer_openid,customer_gender,customer_birthday,
+        customer_type,customer_state,customer_remarks,customer_del)
+        values (#{customer_name},#{customer_telephone},#{customer_wechat_number},#{customer_openid},#{customer_gender},
+        #{customer_birthday},#{customer_type},1,#{customer_remarks},1)
+    </insert>
+
+
+
+
+
+    <!--.......................................详细地址信息...................................................-->
+    <select id="findCustomer_addressBycustomerId" parameterType="Integer" resultType="Customer_address">
+        select * from customer_address where cas_customer_id=#{customer_id} and cas_del=1
+    </select>
+
+    <insert id="insertCustomer_address" parameterType="Customer_address">
+        insert into customer_address (cas_detailed_address,cas_customer_id,cas_consignee_name,cas_receiver_telephone,cas_longitude,cas_latitude,cas_del,cas_state)
+        values (#{cas_detailed_address},#{cas_customer_id},#{cas_consignee_name},#{cas_receiver_telephone},#{cas_longitude},#{cas_latitude},1,1)
+    </insert>
+
+    <update id="updateCustomer_address" parameterType="Customer_address">
+        update customer_address
+        <set>
+            <if test="cas_detailed_address!=null and cas_detailed_address!=''">
+                cas_detailed_address=#{cas_detailed_address},
+            </if>
+            <if test="cas_consignee_name!=null and cas_consignee_name!='' ">
+                cas_consignee_name=#{cas_consignee_name},
+            </if>
+            <if test="cas_receiver_telephone!=null and cas_receiver_telephone!=''">
+                cas_receiver_telephone=#{cas_receiver_telephone},
+            </if>
+        </set>
+        where cas_id=#{cas_id}
+    </update>
+
+    <update id="deleteCustomer_address" parameterType="Integer" >
+        update customer_address set cas_del=2 where cas_id=#{cas_id}
+    </update>
+
+
+
+
+
+
+    <!--.......................................账户信息...................................................-->
+    <select id="findCustomer_accountBycustomerId" parameterType="Integer" resultType="Customer_account">
+         select * from customer_account where cat_del=1 and cat_customer_id=#{customer_id}
+    </select>
+
+    <select id="findCustomer_account_detailedBycatId" parameterType="Integer" resultType="Customer_account_detailed">
+        select cadd.*,com.commodity_name cadd_commodity_name from customer_account_detailed cadd,commodity com
+        where cadd.cadd_commodity_id=com.commodity_id and cadd.cadd_customer_account_id=#{cat_id}
+    </select>
+
+    <select id="findCustomer_accountByCustomerId" parameterType="Integer" resultType="int">
+        select count(*) from customer_account where cat_customer_id=#{customer_id} and cat_del=1
+    </select>
+
+    <select id="findCustomer_account_detailedByCatidAndCommodityid" parameterType="Integer" resultType="int">
+        select count(*) from customer_account_detailed where cadd_customer_account_id=#{param1} and cadd_commodity_id=#{param2}
+    </select>
+
+    <update id="updateCustomer_account" parameterType="Customer_account" >
+        update customer_account
+        <set>
+            <if test="cat_balance!=null and cat_balance!''">
+                cat_balance=#{cat_balance}
+            </if>
+            <if test="cat_state!=null and cat_state!'' and cat_state!=0">
+                cat_state=#{cat_state}
+            </if>
+        </set>
+        where cat_id=#{cat_id}
+    </update>
+    
+    <update id="updateCustomer_account_detailed" parameterType="Customer_account_detailed">
+        update customer_account_detailed  
+        <set>
+            <if test="cadd_number!=null and cadd_number!='' and cadd_number!=0">
+                cadd_number=#{cadd_number}
+            </if>
+        </set>
+        where cadd_customer_account_id=#{cadd_customer_account_id} and cadd_commodity_id=#{cadd_commodity_id}
+    </update>
+
+    <insert id="insertCustomer_account" parameterType="Customer_account">
+        insert into customer_account (cat_number,cat_balance,cat_customer_id,cat_state,cat_del)
+        values (#{cat_number},#{cat_balance},#{cat_customer_id},1,1)
+    </insert>
+
+    <insert id="insertCustomer_account_detailed" parameterType="Customer_account_detailed" >
+        insert into customer_account_detailed (cadd_customer_account_id,cadd_commodity_id,cadd_number)
+        values (#{cadd_customer_account_id},#{cadd_commodity_id},#{cadd_number})
+    </insert>
+
+    <update id="deleteCustomer_account" parameterType="Integer">
+        update customer_account set cat_del=2 where cat_id=#{cat_id}
+    </update>
+
+    <delete id="deleteCustomer_account_detailed" parameterType="Integer">
+        delete from customer_account_detailed where cadd_customer_account_id=#{cat_id}
+    </delete>
+
+
+
+    <!--.......................................押金信息...................................................-->
+    <select id="findCustomer_depositBycustomerId" parameterType="Integer" resultType="Customer_deposit">
+        select * from customer_deposit where cdt_customer_id=#{customer_id} and cdt_del=1
+    </select>
+
+    <select id="findCustomer_deposit_detailedByCddd_id" parameterType="Integer" resultType="Customer_deposit_detailed">
+        select cddd.*,com.commodity_name cddd_commodity_name from customer_deposit_detailed cddd,commodity com
+        where cddd.cddd_commodity_id=com.commodity_id and cddd.cddd_customer_deposit_id=#{cdt_id}
+    </select>
+
+
+
+    <!--.......................................水卡信息...................................................-->
+    <select id="findWater_cardByCustomerId" parameterType="Integer" resultType="Water_card">
+        select * from water_card where wcd_customer_id=#{customer_id} and wcd_del=1
+    </select>
+
+    <select id="findWater_card_detailedByWcd_card_number" parameterType="String" resultType="Water_card_detailed">
+        select wcdd.*,com.commodity_name wcdd_commodity_name from water_card_detailed wcdd,commodity com
+        where wcdd.wcdd_commodity_id = com.commodity_id and wcdd.wcdd_wcd_cardnum=#{wcd_card_number}
+    </select>
+
+</mapper>

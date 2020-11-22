@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.OrderDao">
+
+    <select id="findAllOrder" parameterType="Order" resultType="Order">
+        select ord.*,cus.customer_name order_customer_name,com.commodity_name order_commodity_name,com.commodity_picture_url order_commodity_picture_url,cusa.cas_detailed_address order_address_name
+        from `order` ord,customer cus,commodity com,customer_address cusa
+        where ord.order_customer_id=cus.customer_id and ord.order_commodity_id = com.commodity_id and ord.order_address_id=cusa.cas_id
+        and order_del=1
+        <if test="order_order_number!=null and order_order_number!=''">
+            and order_order_number=#{order_order_number}
+        </if>
+        <if test="order_customer_id!=null and order_customer_id!='' and order_customer_id!=0">
+            and order_customer_id=#{order_customer_id}
+        </if>
+        <if test="order_commodity_id!=null and order_commodity_id!='' and order_commodity_id!=0">
+            and order_commodity_id=#{order_commodity_id}
+        </if>
+        <if test="order_place_order_time!=null">
+            and order_place_order_time between (#{order_place_order_time_starttime} and  #{order_place_order_time_endtime})
+        </if>
+        <if test="order_staff_id!=null and order_staff_id!='' and order_staff_id!=0">
+            and order_staff_id=#{order_staff_id}
+        </if>
+        <if test="order_state!=null and order_state!=0">
+            and order_state=#{order_state}
+        </if>
+        <if test="order_type!=null and order_type!=0">
+            and order_type=#{order_type}
+        </if>
+    </select>
+
+    <select id="findOrderById" parameterType="Integer" resultType="Order">
+        select ord.*,cus.customer_name order_customer_name,com.commodity_name order_commodity_name,com.commodity_picture_url order_commodity_picture_url,cusa.cas_detailed_address order_address_name
+        from `order` ord,customer cus,commodity com,customer_address cusa
+        where ord.order_customer_id=cus.customer_id and ord.order_commodity_id = com.commodity_id and ord.order_address_id=cusa.cas_id
+        and order_del=1 and order_id=#{order_id}
+    </select>
+    
+    
+    
+    
+    <select id="findAllSettlement_method" resultType="Settlement_method">
+        select * from settlement_method where smd_del=1
+    </select>
+
+
+    <select id="findSettlement_methodById" parameterType="Integer" resultType="Settlement_method">
+        select * from settlement_method where smd_id=#{smd_id}
+    </select>
+
+    <insert id="insertSettlement_method" parameterType="Settlement_method">
+        insert into settlement_method (smd_name,smd_usage_scenarios,smd_remarks,smd_del)
+        values (#{smd_name},#{smd_usage_scenarios},#{smd_remarks},1)
+    </insert>
+    
+    <update id="updateSettlement_method" parameterType="Settlement_method">
+        update settlement_method
+        <set>
+            <if test="smd_name!=null and smd_name!=''">
+                smd_name=#{smd_name},
+            </if>
+            <if test="smd_usage_scenarios!=null and smd_usage_scenarios!=''">
+                smd_usage_scenarios=#{smd_usage_scenarios},
+            </if>
+            <if test="smd_remarks!=null and smd_remarks!=''">
+                smd_remarks=#{smd_remarks}
+            </if>
+        </set>
+        where smd_id=#{smd_id}
+    </update>
+
+    <update id="deleteSettlement_method" parameterType="Integer">
+        update settlement_method set smd_del=2 where smd_id=#{smd_id}
+    </update>
+
+
+
+
+    <select id="findAllPayment_channels" resultType="Payment_channels">
+        select * from payment_channels where pcs_del=1
+    </select>
+
+    <select id="findPayment_channelsById" parameterType="Integer" resultType="Payment_channels">
+        select * from payment_channels where pcs_id=#{pcs_id}
+    </select>
+
+    <insert id="insertPayment_channels" parameterType="Payment_channels">
+        insert into payment_channels (pcs_name,pcs_usage_scenarios,pcs_remarks,pcs_del)
+        values (#{pcs_name},#{pcs_usage_scenarios},#{pcs_remarks},1)
+    </insert>
+    
+    <update id="updatePayment_channels" parameterType="Payment_channels">
+        update payment_channels
+        <set>
+            <if test="pcs_name!=null and pcs_name!=''">
+                pcs_name=#{pcs_name},
+            </if>
+            <if test="pcs_usage_scenarios!=null and pcs_usage_scenarios!=''">
+                pcs_usage_scenarios=#{pcs_usage_scenarios},
+            </if>
+            <if test="pcs_remarks!=null and pcs_remarks!=''">
+                pcs_remarks=#{pcs_remarks}
+            </if>
+        </set>
+        where pcs_id=#{pcs_id}
+    </update>
+
+    <update id="deletePayment_channels" parameterType="Integer">
+        update payment_channels set pcs_del=2 where pcs_id=#{pcs_id}
+    </update>
+
+
+
+
+    <select id="findAllRecharge_order" parameterType="Recharge_order" resultType="Recharge_order">
+        select ror.ror_id,ror.ror_order_number,ror.ror_order_time,ror.ror_customer_id,ror.ror_number,ror.ror_money,ror.ror_activity_id,
+        ror.ror_state,ror.ror_remarks,ror.ror_del,smd.smd_name ror_method_payment,pcs.pcs_name ror_payment_channel,cus.customer_name ror_customer_name
+        from recharge_order ror,settlement_method smd,payment_channels pcs,customer cus
+        where ror.ror_del=1 and ror.ror_method_payment=smd.smd_id and ror.ror_method_payment = pcs.pcs_id
+        <if test="ror_order_number!=null and ror_order_number!=''">
+            and ror_order_number=#{ror_order_number}
+        </if>
+        <if test="ror_customer_id!=null and ror_customer_id!=0">
+            and ror_customer_id=#{ror_customer_id}
+        </if>
+    </select>
+
+    <select id="findRecharge_orderById" parameterType="Integer" resultType="Recharge_order">
+        select ror.ror_id,ror.ror_order_number,ror.ror_order_time,ror.ror_customer_id,ror.ror_number,ror.ror_money,ror.ror_activity_id,
+        ror.ror_state,ror.ror_remarks,ror.ror_del,smd.smd_name ror_method_payment,pcs.pcs_name ror_payment_channel,cus.customer_name ror_customer_name
+        from recharge_order ror,settlement_method smd,payment_channels pcs,customer cus
+        where ror.ror_del=1 and ror.ror_method_payment=smd.smd_id and ror.ror_method_payment = pcs.pcs_id
+        and cus.customer_id=ror.ror_customer_id and ror.ror_id=#{ror_id}
+    </select>
+    
+    <insert id="insertRecharge_order" parameterType="Recharge_order" >
+        insert into recharge_order (ror_order_number,ror_order_time,ror_customer_id,ror_number,ror_money,ror_method_payment,ror_payment_channel,ror_activity_id,ror_state,ror_remarks,ror_del)
+        values (#{ror_order_number},#{ror_order_time},#{ror_customer_id},#{ror_number},#{ror_money},#{ror_method_payment},#{ror_payment_channel},#{ror_activity_id},1,#{ror_remarks},1)
+    </insert>
+    
+    <update id="updateRecharge_order" parameterType="Recharge_order">
+        update recharge_order
+        <set>
+            <if test="ror_remarks!=null and ror_remarks!=''">
+                ror_remarks=#{ror_remarks}
+            </if>
+            <if test="ror_state!=null and ror_state!=0">
+                ror_state=#{ror_state}
+            </if>
+        </set>
+        where ror_id=#{ror_id}
+    </update>
+
+    <update id="deleteRecharge_order" parameterType="Integer">
+        update recharge_order set ror_del=2 where ror_id=#{ror_id}
+    </update>
+
+
+    <select id="findRecharge_order_detailedByRor_id" parameterType="Integer" resultType="Recharge_order_detailed">
+        select rodd.*,com.commodity_name rodd_commodity_name
+        from recharge_order_detailed rodd,commodity com
+        where rodd.rodd_ror_id=#{ror_id} and com.commodity_id=rodd.rodd_commodity_id
+    </select>
+
+    <insert id="insertRecharge_order_detailed" parameterType="Recharge_order_detailed">
+        insert into recharge_order_detailed (rodd_commodity_id,rodd_number,rodd_money,rodd_ror_id)
+        values (#{rodd_commodity_id},#{rodd_number},#{rodd_money},#{rodd_ror_id})
+    </insert>
+    
+    <update id="updateRecharge_order_detailed" parameterType="Recharge_order_detailed">
+        update recharge_order_detailed
+        <set>
+            <if test="rodd_number!=null and rodd_number!=0">
+                rodd_number=#{rodd_number},
+            </if>
+            <if test="rodd_money!=null and rodd_money!=0">
+                rodd_money=#{rodd_money},
+            </if>
+        </set>
+        where rodd_id=#{rodd_id}
+    </update>
+
+    <!--PC 首页查询当日订单情况-->
+    <select id="selectOrderCount" parameterType="Integer" resultType="Integer">
+        select COUNT(*) from `order` where TO_DAYS(order_place_order_time) = TO_DAYS(NOW())
+        <if test="order_state!=null and order_state!=0">
+            and order_state = #{order_state}
+        </if>
+    </select>
+
+    <!-- PC 查询当周每一天的订单数 -->
+    <select id="selectWeekOrder" parameterType="String" resultType="Integer">
+        SELECT COUNT(*) FROM `order` where order_place_order_time like concat('%',#{format},'%')
+    </select>
+</mapper>

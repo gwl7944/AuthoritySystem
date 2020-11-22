@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.CommodityDao">
+
+    <!--..............................商品基本信息操作..................................................-->
+    <select id="findAllCommodity" parameterType="Commodity" resultType="Commodity">
+        select * from commodity where commodity_del=1
+        <if test="commodity_name!=null and commodity_name!=''">
+            and commodity_name like concat('%',#{commodity_name},'%')
+        </if>
+    </select>
+
+    <select id="findCommodityById" parameterType="Integer" resultType="Commodity">
+        select * from commodity where commodity_id=#{commodity_id}
+    </select>
+
+    <update id="updateCommodity" parameterType="Commodity">
+        update commodity
+        <set>
+            <if test="commodity_name!=null and commodity_name!=''">
+                commodity_name=#{commodity_name},
+            </if>
+            <if test="commodity_picture_url!=null and commodity_picture_url!=''">
+                commodity_picture_url=#{commodity_picture_url},
+            </if>
+            <if test="commodity_isbetbucket!=null and commodity_isbetbucket!=0">
+                commodity_isbetbucket=#{commodity_isbetbucket},
+            </if>
+            <if test="commodity_classification!=null and commodity_classification!=0">
+                commodity_classification=#{commodity_classification},
+            </if>
+            <if test="commodity_unit_price!=null and commodity_unit_price!=0">
+                commodity_unit_price=#{commodity_unit_price},
+            </if>
+            <if test="commodity_remarks!=null and commodity_remarks!=''">
+                commodity_remarks=#{commodity_remarks},
+            </if>
+            <if test="commodity_state!=null and commodity_state!=0 ">
+                commodity_state=#{commodity_state},
+            </if>
+            <if test="commodity_introduce!=null and commodity_introduce!=''">
+                commodity_introduce=#{commodity_introduce},
+            </if>
+            <if test="commodity_settlement_method!=null and commodity_settlement_method!=''">
+                commodity_settlement_method=#{commodity_settlement_method}
+            </if>
+        </set>
+        where commodity_id = #{commodity_id}
+    </update>
+
+    <update id="deleteCommodity" parameterType="Integer">
+        update commodity set commodity_del=2 where commodity_id=#{commodity_id}
+    </update>
+
+    <insert id="insertCommodity" parameterType="Commodity" useGeneratedKeys="true" keyProperty="commodity_id" keyColumn="commodity_id">
+        insert into commodity (commodity_name, commodity_picture_url, commodity_isbetbucket, commodity_classification, commodity_specifications,
+                               commodity_unit_price, commodity_remarks, commodity_state, commodity_introduce, commodity_settlement_method, commodity_del)
+        values (#{commodity_name}, #{commodity_picture_url}, #{commodity_isbetbucket}, #{commodity_classification}, #{commodity_specifications},
+                #{commodity_unit_price}, #{commodity_remarks}, 1, #{commodity_introduce}, #{commodity_settlement_method}, 1)
+    </insert>
+
+
+    <select id="selectCommodityDepositManagement" parameterType="Integer" resultType="Deposit_management">
+        select dmt_id,dmt_unit_price
+        from deposit_management
+        where dmt_commodity_id = #{commodity_id} and dmt_del = 1
+    </select>
+
+
+    <!--..............................活动部分..................................................-->
+    <select id="findAllActivity" parameterType="Activity" resultType="Activity">
+        select * from activity where activity_del=1
+        <if test="activity_name!=null and activity_name!=''">
+            and activity_name like concat('%',#{activity_name},'%')
+        </if>
+    </select>
+
+    <!--<select id="findActivityById" parameterType="Integer" resultType="Activity">
+            select * from activity where activity_id=#{activity_id}
+        </select>-->
+    <select id="findActivityById" parameterType="Integer" resultType="Activity">
+           select ac.*,asd.asd_upper_limit_number,asd.asd_upper_limit_money,apf.apfa_numerical_add,apf.apfa_numerical_multiply
+           from activity ac,activity_standard asd,activity_parameters_formula apf where asd.activity_asd_id=ac.activity_id and apf.apfa_activity_id =ac.activity_id and activity_id=#{activity_id} and ac.activity_del =1
+    </select>
+
+
+    <update id="updateActivity" parameterType="Activity">
+        update activity
+        <set>
+            <if test="activity_name!=null and activity_name!=''">
+                activity_name=#{activity_name},
+            </if>
+            <if test="activity_take_effect_time!=null">
+                activity_take_effect_time=#{activity_take_effect_time},
+            </if>
+            <if test="activity_failure_time!=null">
+                activity_failure_time=#{activity_failure_time},
+            </if>
+            <if test="activity_Range!=null and activity_Range!=''">
+                activity_Range=#{activity_Range},
+            </if>
+            <if test="activity_remarks!=null and activity_remarks!=''">
+                activity_remarks=#{activity_remarks},
+            </if>
+            <if test="activity_state!=null and activity_state!='' and activity_state!=0">
+                activity_state=#{activity_state}
+            </if>
+        </set>
+        where activity_id=#{activity_id}
+    </update>
+
+    <update id="deleteActivity" parameterType="Integer">
+        update activity set activity_del=2 where activity_id=#{activity_id}
+    </update>
+
+    <!--新增活动   -->
+    <insert id="insertActivity" parameterType="Activity" useGeneratedKeys="true" keyProperty="activity_id">
+        insert into activity (activity_name,activity_take_effect_time,activity_failure_time,activity_Range,activity_remarks,activity_state,activity_del)
+        values (#{activity_name},#{activity_take_effect_time},#{activity_failure_time},#{activity_Range},#{activity_remarks},1,1)
+    </insert>
+
+
+    <!--....................活动标准....................-->
+    <select id="findAllActivity_standard" resultType="Activity_standard">
+        select * from activity_standard where asd_del=1
+    </select>
+
+    <select id="findActivity_standardById" parameterType="Integer" resultType="Activity_standard">
+        select * from activity_standard where asd_del=1 and asd_id=#{asd_id}
+    </select>
+
+    <update id="updateActivity_standard" parameterType="Activity_standard">
+        update activity_standard
+        <set>
+            <if test="asd_upper_limit_number!=null and asd_upper_limit_number!=0">
+                asd_upper_limit_number=#{asd_upper_limit_number},
+            </if>
+            <if test="asd_upper_limit_money!=null and asd_upper_limit_money!=0">
+                asd_upper_limit_money=#{asd_upper_limit_money}
+            </if>
+        </set>
+        where asd_id=#{asd_id}
+    </update>
+    <!--修改活动标准2-->
+    <update id="updateActivity_standard2" parameterType="Activity">
+        update activity_standard
+        <set>
+            <if test="asd_upper_limit_number!=null and asd_upper_limit_number!=0">
+                asd_upper_limit_number=#{asd_upper_limit_number},
+            </if>
+            <if test="asd_upper_limit_money!=null and asd_upper_limit_money!=0">
+                asd_upper_limit_money=#{asd_upper_limit_money}
+            </if>
+        </set>
+        where activity_asd_id=#{activity_id}
+    </update>
+
+    <update id="deleteActivity_standard" parameterType="Integer">
+        update activity_standard set asd_del=2 where asd_id=#{asd_id}
+    </update>
+    <!--删除活动修改版-->
+    <update id="deleteActivity_standard2" parameterType="Integer">
+        update activity_standard set asd_del=2 where activity_asd_id=#{activity_id}
+    </update>
+
+    <insert id="insertActivity_standard" parameterType="Activity_standard">
+        insert into activity_standard (asd_code,asd_upper_limit_number,asd_upper_limit_money,activity_asd_id,asd_del)
+        values (#{asd_code},#{asd_upper_limit_number},#{asd_upper_limit_money},#{activity_asd_id},1)
+    </insert>
+
+
+    <!--....................活动参考公式....................-->
+    <select id="findAllactivity_parameters_formula" resultType="Activity_parameters_formula">
+        select apf.*,ac.activity_name apfa_activity_name from activity_parameters_formula apf,activity ac where apf.apfa_del=1 and apf.apfa_activity_id=ac.activity_id
+    </select>
+
+    <select id="findactivity_parameters_formulaById" parameterType="Integer" resultType="Activity_parameters_formula">
+        select * from activity_parameters_formula where apfa_del=1 and apfa_id=#{apfa_id}
+    </select>
+
+    <insert id="insertActivity_parameters_formula" parameterType="Activity_parameters_formula">
+        insert into activity_parameters_formula (apfa_code,apfa_numerical_add,apfa_numerical_multiply,apfa_activity_id,apfa_del)
+        values (#{apfa_code},#{apfa_numerical_add},#{apfa_numerical_multiply},#{apfa_activity_id},1)
+    </insert>
+
+    <update id="updateActivity_parameters_formula" parameterType="Activity_parameters_formula">
+        update activity_parameters_formula
+        <set>
+            <if test="apfa_numerical_add!=null and apfa_numerical_add!=0">
+                apfa_numerical_add=#{apfa_numerical_add},
+            </if>
+            <if test="apfa_numerical_multiply!=null and apfa_numerical_multiply!=0">
+                apfa_numerical_multiply=#{apfa_numerical_multiply},
+            </if>
+        </set>
+        where apfa_id=#{apfa_id}
+    </update>
+    <!--修改活动公式2-->
+    <update id="updateActivity_parameters_formula2" parameterType="Activity">
+        update activity_parameters_formula
+        <set>
+            <if test="apfa_numerical_add!=null and apfa_numerical_add!=0">
+                apfa_numerical_add=#{apfa_numerical_add},
+            </if>
+            <if test="apfa_numerical_multiply!=null and apfa_numerical_multiply!=0">
+                apfa_numerical_multiply=#{apfa_numerical_multiply},
+            </if>
+        </set>
+        where apfa_activity_id=#{activity_id}
+    </update>
+
+    <update id="deleteActivity_parameters_formula" parameterType="Integer">
+        update activity_parameters_formula set apfa_del=2 where apfa_id=#{apfa_id}
+    </update>
+    <!--删除活动公式修改版-->
+    <update id="deleteActivity_parameters_formula2" parameterType="Integer">
+        update activity_parameters_formula set apfa_del=2 where apfa_activity_id=#{activity_id}
+    </update>
+
+
+    <!--....................押金模块....................-->
+    <select id="findAllDeposit_management" resultType="Deposit_management">
+        select dmt.*,com.commodity_name dmt_commodity_name from deposit_management dmt,commodity com where dmt.dmt_del=1 and dmt.dmt_commodity_id=com.commodity_id
+    </select>
+
+    <select id="findDeposit_managementById" parameterType="Integer" resultType="Deposit_management">
+        select dmt.*,com.commodity_name dmt_commodity_name from deposit_management dmt,commodity com where dmt.dmt_del=1 and dmt.dmt_id=#{dmt_id} and dmt.dmt_commodity_id=com.commodity_id
+    </select>
+
+    <insert id="insertDeposit_management" parameterType="Deposit_management">
+        insert into deposit_management (dmt_commodity_id,dmt_unit_price,dmt_del)
+        values (#{dmt_commodity_id},#{dmt_unit_price},1)
+    </insert>
+
+    <update id="updateDeposit_management" parameterType="Deposit_management">
+        update deposit_management set dmt_unit_price=#{dmt_unit_price} where dmt_id=#{dmt_id}
+    </update>
+
+    <update id="deleteDeposit_management" parameterType="Integer">
+        update deposit_management set dmt_del=2 where dmt_id=#{dmt_id}
+    </update>
+
+
+    <!--轮播图保存-->
+    <insert id="insertSlideshow" parameterType="com.web.pojo.Commodity_slideshow">
+        insert into commodity_slideshow(cs_introduce,cs_url,cs_address,cs_del) values (#{cs_introduce},#{cs_url},#{cs_address},1)
+    </insert>
+
+    <!--轮播图更新-->
+    <update id="updateSlideshowSql" parameterType="com.web.pojo.Commodity_slideshow">
+        update commodity_slideshow
+        <set>
+            <if test="cs_introduce!=null and cs_introduce!=''">
+                cs_introduce=#{cs_introduce},
+            </if>
+            <if test="cs_url!=null and cs_url!=''">
+                cs_url=#{cs_url},
+            </if>
+            <if test="cs_address!=null and cs_address!=0">
+                cs_address=#{cs_address}
+            </if>
+        </set>
+        where cs_id = #{cs_id}
+    </update>
+
+    <!--查询轮播图-->
+    <select id="selectSlideshow" parameterType="Integer" resultType="com.web.pojo.Commodity_slideshow">
+        select * from commodity_slideshow where cs_del =1
+        <if test="cs_address!=null and cs_address!=0">
+            and cs_address = #{cs_address}
+        </if>
+    </select>
+
+    <!--删除轮播图 假删-->
+    <update id="delSlideshowSql" parameterType="Integer">
+        update commodity_slideshow set cs_del = 2 where cs_id = #{cs_id}
+    </update>
+
+    <!-- 回显轮播数据 -->
+    <select id="selectSlideshowById" parameterType="Integer" resultType="com.web.pojo.Commodity_slideshow">
+        select * from commodity_slideshow where cs_id = #{cs_id}
+    </select>
+
+    <!--商品图片集上传-->
+    <insert id="insertCommPic" parameterType="com.web.pojo.Comm_pic">
+        insert into comm_pic(comm_pic,comm_type,pic_commodity_id,comm_del) values(#{comm_pic},#{comm_type},#{pic_commodity_id},1)
+    </insert>
+
+    <!--查询商品图片-->
+    <select id="selectCommodiyPic" parameterType="Integer" resultType="com.web.pojo.Comm_pic">
+        select * from comm_pic where pic_commodity_id = #{commodity_id} and comm_del = 1
+    </select>
+
+    <!-- 更新商品图片信息 -->
+    <select id="updateCommPic" parameterType="com.web.pojo.Comm_pic">
+        update comm_pic
+        <set>
+            <if test="comm_pic!=null and comm_pic!=''">
+                comm_pic=#{comm_pic},
+            </if>
+            <if test="comm_type!=null and comm_type!=0">
+                comm_type=#{comm_type}
+            </if>
+        </set>
+        where comm_id = #{comm_id}
+    </select>
+
+    <!--删除数据库商品图片-->
+    <update id="deleteCommPicSql" parameterType="Integer">
+        update comm_pic set comm_del = 2 where  comm_id = #{comm_id}
+    </update>
+
+    <!--删除数据库商品图片-->
+    <update id="deleteCommpicByCommodityId" parameterType="Integer">
+        update comm_pic set comm_del = 2  where pic_commodity_id = #{commodity_id}
+    </update>
+</mapper>

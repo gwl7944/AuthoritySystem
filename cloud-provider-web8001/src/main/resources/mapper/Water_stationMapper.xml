@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.dao.Water_stationDao">
+
+    <select id="findAllWater_station" parameterType="Water_station" resultType="Water_station">
+        select * from water_station where wsn_del=1
+    </select>
+
+    <select id="findWater_stationById" parameterType="Integer" resultType="Water_station">
+        select * from water_station where wsn_id=#{wsn_id}
+    </select>
+
+    <update id="updateWater_station" parameterType="Water_station">
+        update water_station
+        <set>
+            <if test="wsn_name!=null and wsn_name!=''">
+                wsn_name=#{wsn_name},
+            </if>
+            <if test="wsn_code!=null and wsn_code!='' ">
+                wsn_code=#{wsn_code},
+            </if>
+            <if test="wsn_address!=null and wsn_address!=''">
+                wsn_address=#{wsn_address},
+            </if>
+            <if test="wsn_telephone!=null and wsn_telephone!=''">
+                wsn_telephone=#{wsn_telephone},
+            </if>
+            <if test="wsn_water_margin!=null and wsn_water_margin!='' and wsn_water_margin!=0">
+                wsn_water_margin=#{wsn_water_margin},
+            </if>
+            <if test="wsn_barrels_empty!=null and wsn_barrels_empty!='' and wsn_barrels_empty!=0">
+                wsn_barrels_empty=#{wsn_barrels_empty},
+            </if>
+            <if test="wsn_remarks!=null and wsn_remarks!='' ">
+                wsn_remarks=#{wsn_remarks},
+            </if>
+            <if test="wsn_state!=null and wsn_state!='' and wsn_state!=0">
+                wsn_state=#{wsn_state}
+            </if>
+        </set>
+        where wsn_id = #{wsn_id}
+    </update>
+
+    <update id="deleteWater_station" parameterType="Integer">
+        update water_station set wsn_del=2 where wsn_id=#{wsn_id}
+    </update>
+
+    <insert id="insertWater_station" parameterType="Water_station">
+        insert into water_station (wsn_name,wsn_code,wsn_address,wsn_telephone,wsn_water_margin,wsn_barrels_empty,wsn_remarks,wsn_state,wsn_del)
+        values (#{wsn_name},#{wsn_code},#{wsn_address},#{wsn_telephone},#{wsn_water_margin},#{wsn_barrels_empty},#{wsn_remarks},1,1)
+    </insert>
+
+    <select id="findWater_station_detailedByWsn_id" parameterType="Integer" resultType="Water_station_detailed">
+        select wsdd.*,com.commodity_name wsdd_commodity_name,com.commodity_picture_url wsdd_commodity_url from water_station_detailed wsdd,commodity com
+        where wsdd.wsdd_commodity_id = com.commodity_id and wsdd.wsdd_water_station_id = #{wsn_id}
+    </select>
+
+</mapper>
