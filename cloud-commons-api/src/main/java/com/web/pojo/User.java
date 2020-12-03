@@ -21,6 +21,8 @@ import java.util.Date;
 @NoArgsConstructor
 public class User {
 
+    
+
     private Integer code;
     private String login_name;
     private String login_pwssaord;

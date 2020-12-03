@@ -1,0 +1,24 @@
+server:
+  port: 2233
+
+spring:
+  application:
+    name: cloud-file_operation
+  servlet:
+    multipart:
+      max-file-size: 100MB  #单个文件上传大小
+      max-request-size: 100MB  #总共上传大小
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.gjt.mm.mysql.Driver
+    url: jdbc:mysql://192.168.0.88:3306/txmountainspring?useUnicode=true&characterEncoding-utr-8&useSSL=false
+    username: root
+    password: root
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.web.pojo

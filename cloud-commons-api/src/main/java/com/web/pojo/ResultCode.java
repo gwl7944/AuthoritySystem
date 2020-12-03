@@ -76,6 +76,9 @@ public enum ResultCode {
     AUDIT_ERROR(516, "审核失败!"),
     IMG_SUCCESS(517, "图片上传成功"),
     IMG_ERROR(518, "图片上传失败"),
+    FILE_SUCCESS(519, "文件上传成功"),
+    FILE_ERROR(520, "文件上传失败"),
+
 
     /**
      * 请求状态

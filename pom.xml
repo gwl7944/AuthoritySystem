@@ -11,6 +11,7 @@
         <module>cloud-commons-api</module>
         <module>cloud-consumer-common80</module>
         <module>cloud-provider-web8001</module>
+        <module>cloud-file_operation2233</module>
     </modules>
     <packaging>pom</packaging>
 
